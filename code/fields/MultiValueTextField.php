@@ -15,12 +15,12 @@ class MultiValueTextField extends FormField {
 		$name = $this->name . '[]';
 		$fields = array();
 
-		$attributes = array(
-			'type' => 'text',
+		$attributes = array_merge(
+			parent::getAttributes(),
+			array(
 			'class' => 'text mvtextfield mventryfield ' . ($this->extraClass() ? $this->extraClass() : ''),
-			// 'id' => $this->id(),
 			'name' => $name,
-			// 'value' => $this->Value(),
+			)
 		);
 
 		if($this->disabled) $attributes['disabled'] = 'disabled';
