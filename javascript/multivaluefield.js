@@ -1,12 +1,19 @@
 jQuery(function($) {
 	function addNewField() {
-		var self = $(this);
-		var val = self.val();
+		var self = $(this),
+			val = self.val(),
+			parentul = self.parents("ul.multivaluefieldlist"),
+			forced = parentul.hasClass("forced"),
+			nth = self.parents("li").index(),
+			linked_id = self.data("linked"),
+			linked_ul = $("div#"+linked_id).find("ul"),
+			linked_input = linked_ul.find(".mventryfield:eq("+nth+")"),
+			detach = self.hasClass('detach');
 
 		// check to see if the one after us is there already - if so, we don't need a new one
 		var li = $(this).closest('li').next('li');
 
-		if (!val) {
+		if (!val && !forced && !detach) {
 			// lets also clean up if needbe
 			var nextText = li.find('input.mventryfield');
 			var detach = true;
@@ -17,12 +24,17 @@ jQuery(function($) {
 				}
 			});
 
+			if(linked_id && linked_input.val()){
+				detach = false;
+			}
+
 			if (detach) {
 				li.detach();
+				parentul.trigger('multiValueFieldRemoved');
 			}
 
 		} else {
-			if (li.length) {
+			if ( (li.length && !forced) ) {
 				return;
 			}
 
@@ -39,10 +51,22 @@ jQuery(function($) {
 				return this.id.substr(0, pos + 1) + (num + 1).toString();
 			});
 
-			append.appendTo(self.parents("ul.multivaluefieldlist"));
+			append.appendTo(parentul);
 		}
 
 		$(this).trigger('multiValueFieldAdded');
+
+		if(linked_id && ( !forced || detach )){
+			var linked_iterations = Math.abs( linked_ul.find("li").length - parentul.find("li").length );
+
+			if(linked_iterations > 0){
+				linked_ul.addClass("forced");
+				if(!forced && detach)
+				linked_ul.addClass("detach");
+				linked_input.trigger('focusout');
+				linked_ul.removeClass("detach forced");
+			}
+		}
 	}
 
 	$(document).on("keyup, focusout", ".mventryfield", addNewField);
@@ -54,8 +78,6 @@ jQuery(function($) {
 				$(this).sortable();
 			}
 		})
-	} else {
-		$('ul.multivaluefieldlist').sortable();
 	}
 	
 });
