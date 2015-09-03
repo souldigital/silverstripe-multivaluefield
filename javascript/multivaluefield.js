@@ -45,7 +45,7 @@ jQuery(function($) {
 		$(this).trigger('multiValueFieldAdded');
 	}
 
-	$(document).on("keyup", ".mventryfield", addNewField);
+	$(document).on("keyup, focusout", ".mventryfield", addNewField);
 	$(document).on("change", ".mventryfield:not(input)", addNewField);
 	
 	if ($.entwine) {
