@@ -45,10 +45,12 @@ jQuery(function($) {
 			// Assign the new inputs a unique ID, so that chosen picks up
 			// the correct container.
 			append.find("input, select").val("").attr("id", function() {
-				var pos = this.id.lastIndexOf(":");
-				var num = parseInt(this.id.substr(pos + 1));
-
-				return this.id.substr(0, pos + 1) + (num + 1).toString();
+				var pos = this.id.lastIndexOf(":"),
+					pos = (parseInt(pos) > 0)?pos:this.id.length;
+				var num = parseInt(this.id.substr(pos + 1)),
+					num = (num > 0)?num:0;
+				var add = (pos == this.id.length)?":":"";
+				return this.id.substr(0, pos + 1) + add + (num + 1).toString();
 			});
 
 			append.appendTo(parentul);
@@ -57,21 +59,25 @@ jQuery(function($) {
 		$(this).trigger('multiValueFieldAdded');
 
 		if(linked_id && ( !forced || detach )){
-			var linked_iterations = Math.abs( linked_ul.find("li").length - parentul.find("li").length );
+			var linked_iterations =  parentul.find("li").length - linked_ul.find("li").length;
 
 			if(linked_iterations > 0){
 				linked_ul.addClass("forced");
 				if(!forced && detach)
-				linked_ul.addClass("detach");
+					linked_ul.addClass("detach");
+				linked_input.trigger('focusout');
+				linked_ul.removeClass("detach forced");
+			}else if(linked_iterations < 0){
 				linked_input.trigger('focusout');
 				linked_ul.removeClass("detach forced");
 			}
 		}
 	}
 
+
 	$(document).on("keyup, focusout", ".mventryfield", addNewField);
 	$(document).on("change", ".mventryfield:not(input)", addNewField);
-	
+
 	if ($.entwine) {
 		$('ul.multivaluefieldlist').entwine({
 			onmatch: function () {
@@ -79,5 +85,5 @@ jQuery(function($) {
 			}
 		})
 	}
-	
+
 });
